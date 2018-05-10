@@ -13,42 +13,47 @@
 		"node": ">=4"
 	},
 	"scripts": {
+		"Wserver": "nodemon index.js",
 		"test": "nyc ava",
 		"precommit": "lint-staged",
 		"prettier":
-		"prettier --single-quote --trailing-comma es5 --write 'src/**/*.js'",
+			"prettier --single-quote --trailing-comma es5 --write 'src/**/*.js'",
 		"npmUp": "npm version patch && npm publish",
 		"git": "git push && git push --tags",
-		"pub" : "npm run test && npm run npmUp && npm run git"
+		"pub": "npm run test && npm run npmUp && npm run git"
 	},
 	"lint-staged": {
 		"*.{js,json,css,md}": [
 			"prettier --single-quote --trailing-comma es5 --write",
-			 "git add"
-			]
-	  },
-	"files": [
-		"index.js"
-	],
-	"keywords": [
-		""
-	],
-	"dependencies":{
-
+			"git add"
+		]
+	},
+	"files": ["index.js"],
+	"keywords": [""],
+	"dependencies": {
+		"cookie": "^0.3.1",
+		"form-data": "^2.3.2",
+		"gbk": "^0.1.0",
+		"got": "8.2.0",
+		"koa": "^2.5.1",
+		"koa-body": "^2.5.0",
+		"koa-logger": "^3.2.0",
+		"koa-router": "^7.4.0",
+		"koa-static": "^4.0.2",
+		"nodemon": "^1.17.4",
+		"superagent": "^3.8.3",
+		"superagent-charset": "^1.2.0",
 		"validate-switch": "^0.0.2"
 	},
 	"devDependencies": {
-		"lint-staged": "^7.0.0",
-		"husky": "^0.14.3",
-		"prettier": "^1.12.1",
 		"ava": "^0.20.0",
 		"codecov": "^2.2.0",
-		"nyc": "^11.0.0"
+		"husky": "^0.14.3",
+		"lint-staged": "^7.0.0",
+		"nyc": "^11.0.0",
+		"prettier": "^1.12.1"
 	},
 	"nyc": {
-		"reporter": [
-			"lcov",
-			"text"
-		]
+		"reporter": ["lcov", "text"]
 	}
 }
