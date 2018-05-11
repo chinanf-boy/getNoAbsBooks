@@ -54,12 +54,15 @@ const superProGet = async url => {
 async function getNoAbsBooks(ctx) {
 	try {
 		let G = ctx.request.body;
-		let U = G.Url;
+		let U = G.url;
+		console.log(U);
 		let resAgain = await superProGet(U);
 
 		let cutAbs = resAgain.text.split('\n');
 		let keep = false;
+
 		cutAbs = cutAbs.filter(line => {
+			// just need header - footer
 			if (line.includes(`class="header"`)) {
 				keep = true;
 			} else if (line.includes(`class="footer"`)) {
@@ -72,29 +75,50 @@ async function getNoAbsBooks(ctx) {
 		});
 
 		let removeHTML = cutAbs.map(div => {
+			// remove html
 			if (div.includes(`.html`)) {
 				div = div.replaceAll(`.html`, ``);
 			}
-			// if(div.includes(`option value`)){
-			// 	div = div.replaceAll()
-			// }
+			// change 首页
+			if (div.includes(`首页`)) {
+				div = div.replace(`http://m.81xsw.com`, '/');
+			}
+			let reMove = ['字体', '关灯', '护眼', '>大<', '>小<', '>中<'];
+			if (reMove.some(r => div.includes(r))) {
+				div = '';
+			}
 			return div;
 		});
+
+		let addJS = `onchange="
+		 var A = document.createElement('a');
+		 let href = window.location.href
+		 if(window.location.href.includes('/index_')){
+			let RmHrefIndex = window.location.href.lastIndexOf('/')
+			href = href.substring(0, RmHrefIndex)
+		 }
+		 A.href=href+'/'+optionsselectedIndex].value;
+		 A.click();"
+		 `;
 
 		let addVueHref = removeHTML.map(div => {
 			if (div.includes(`href="/book`)) {
 				div = div.replaceAll(`href="/book`, `href="#/book`);
 			}
+			if (
+				div.includes(
+					`onchange="self.location.href=options[selectedIndex].value"`
+				)
+			) {
+				div = div.replace(
+					`onchange="self.location.href=options[selectedIndex].value"`,
+					`${addJS} multiple style="width: 100%; height" `
+				);
+			}
 			return div;
 		});
 
 		let resGood = addVueHref.join('\n');
-
-		let addJsOnchange = `<script>
-		function C(event){
-
-		}
-		</script>`;
 
 		ctx.response.body = resGood;
 	} catch (e) {
