@@ -10,15 +10,21 @@ const router = require('koa-router')({
 	prefix: '/api',
 });
 const static = require('koa-static')(path.resolve(__dirname, '.', 'dist'));
-require('./util'); //replaceAll
+const { removeHttP } = require('./util'); //replaceAll
 
 const PORT = process.env.PORT || 5000;
+const JSONSTORE =
+	process.env.JSONSTORE ||
+	'https://www.jsonstore.io/4035ca03c1c8b0b257ef405506b41d05d4115ec154d95076981290ebd8087daf';
 const ROOT_DIR = process.env.NODE_ENV === 'production' ? '/' : __dirname;
+let API = process.env.API || `http://m.76wx.com`;
 
 const app = new Koa();
 
 // Routes definition
 router.post('/getNoAbsBooks', getNoAbsBooks);
+router.post('/addJsonStore', addJsonStore);
+
 router.get('/getAllBooks', getAllBooks);
 
 // router.get('/getNoAbsBooksA', getNoAbsBooksA)
@@ -55,7 +61,7 @@ async function getNoAbsBooks(ctx) {
 	try {
 		let G = ctx.request.body;
 		let U = G.url;
-		console.log(U);
+		// console.log(U);
 		let resAgain = await superProGet(U);
 
 		let cutAbs = resAgain.text.split('\n');
@@ -81,7 +87,7 @@ async function getNoAbsBooks(ctx) {
 			}
 			// change 首页
 			if (div.includes(`首页`)) {
-				div = div.replace(`http://m.81xsw.com`, '/');
+				div = div.replace(API, '/');
 			}
 			let reMove = ['字体', '关灯', '护眼', '>大<', '>小<', '>中<'];
 			if (reMove.some(r => div.includes(r))) {
@@ -97,7 +103,11 @@ async function getNoAbsBooks(ctx) {
 			let RmHrefIndex = window.location.href.lastIndexOf('/')
 			href = href.substring(0, RmHrefIndex)
 		 }
-		 A.href=href+'/'+optionsselectedIndex].value;
+		 if(!href.endsWith('/')){
+			href += '/'
+		 }
+		 A.href= href+options[selectedIndex].value;
+		 console.log(A)
 		 A.click();"
 		 `;
 
@@ -122,8 +132,8 @@ async function getNoAbsBooks(ctx) {
 
 		ctx.response.body = resGood;
 	} catch (e) {
-		console.error('\n> Could not obtain token\n' + e);
-		process.exit(1);
+		console.error(' getNoAbsBooks error', ctx.request);
+		ctx.response.body = e;
 	}
 }
 
@@ -141,11 +151,9 @@ const superProG = async url => {
 
 async function getAllBooks(ctx) {
 	try {
-		let JSONSTORE =
-			'https://www.jsonstore.io/4035ca03c1c8b0b257ef405506b41d05d4115ec154d95076981290ebd8087daf';
-		JSONSTORE = JSONSTORE + '/books';
+		let J = JSONSTORE + '/books';
 
-		let res = await superProG(JSONSTORE);
+		let res = await superProG(J);
 
 		ctx.response.body = res.text;
 	} catch (e) {
@@ -153,3 +161,77 @@ async function getAllBooks(ctx) {
 		process.exit(1);
 	}
 }
+
+//
+const superProP = async (url, form) => {
+	return new Promise((ok, bad) => {
+		superagent
+			.post(url)
+			.send(form)
+			.end((err, res) => {
+				if (!err) {
+					ok(res);
+				}
+				bad(err);
+			});
+	});
+};
+
+async function addJsonStore(ctx) {
+	try {
+		let G = ctx.request.body;
+		let ID = G.id;
+		let url = '/book/' + ID;
+
+		let source = removeHttP(API);
+
+		let J = JSONSTORE + '/books/' + ID;
+
+		let name = await idGetName(ID);
+		if (!name) {
+			throw new Error('can not get Name');
+		}
+
+		let form = { id: ID, name, url, source, api: API };
+		// console.log('addJSON ',form)
+		let res = await superProP(J, form);
+		ctx.response.body = res.text;
+	} catch (error) {
+		console.error('addJSONSTORE error', ctx.request);
+		ctx.response.body = error;
+	}
+}
+
+async function idGetName(id) {
+	let U = `${API}/book/${id}/`;
+	// console.log('add',U)
+	let H = await superSource(U)
+		.then(res => {
+			return res.text
+				.split('\n')
+				.filter(x => x.includes('bqgmb_h1'))
+				.join('');
+		})
+		.catch(err => '');
+	// console.log(H)
+
+	H = H.slice(H.lastIndexOf('1">') + 3, -6);
+
+	return H;
+}
+
+//
+
+const superSource = async url => {
+	return new Promise((ok, bad) => {
+		superagent
+			.get(url)
+			.charset('gbk')
+			.end((err, res) => {
+				if (!err) {
+					ok(res);
+				}
+				bad(err);
+			});
+	});
+};
