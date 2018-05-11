@@ -17,6 +17,8 @@ const app = new Koa();
 
 // Routes definition
 router.post('/getNoAbsBooks', getNoAbsBooks);
+router.get('/getAllBooks', getAllBooks);
+
 // router.get('/getNoAbsBooksA', getNoAbsBooksA)
 
 // Middleware
@@ -31,7 +33,7 @@ app.listen(PORT);
 console.log('* get 81 started on port %s', PORT);
 console.log('* Output directory: %s', ROOT_DIR);
 
-const H = async url => {
+const superProGet = async url => {
 	return new Promise((ok, bad) => {
 		superagent
 			.get(url)
@@ -49,7 +51,7 @@ async function getNoAbsBooks(ctx) {
 	try {
 		let G = ctx.request.body;
 		let U = G.Url;
-		let resAgain = await H(U);
+		let resAgain = await superProGet(U);
 
 		let cutAbs = resAgain.text.split('\n');
 		let keep = false;
@@ -63,21 +65,35 @@ async function getNoAbsBooks(ctx) {
 		});
 
 		let resGood = cutAbs.join('\n');
-		let resHead = `<!DOCTYPE html>
-		<html lang="en">
-		<head>
-			<meta charset="gbk">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<meta http-equiv="X-UA-Compatible" content="ie=edge">
-			<title>Document</title>
-		</head>
-		<body>`;
 
-		let resFoot = `</body>
-		</html>
-		`;
+		ctx.response.body = resGood;
+	} catch (e) {
+		console.error('\n> Could not obtain token\n' + e);
+		process.exit(1);
+	}
+}
 
-		ctx.response.body = resHead + resGood + resFoot;
+//
+const superProG = async url => {
+	return new Promise((ok, bad) => {
+		superagent.get(url).end((err, res) => {
+			if (!err) {
+				ok(res);
+			}
+			bad(err);
+		});
+	});
+};
+
+async function getAllBooks(ctx) {
+	try {
+		let JSONSTORE =
+			'https://www.jsonstore.io/4035ca03c1c8b0b257ef405506b41d05d4115ec154d95076981290ebd8087daf';
+		JSONSTORE = JSONSTORE + '/books';
+
+		let res = await superProG(JSONSTORE);
+
+		ctx.response.body = res.text;
 	} catch (e) {
 		console.error('\n> Could not obtain token\n' + e);
 		process.exit(1);
