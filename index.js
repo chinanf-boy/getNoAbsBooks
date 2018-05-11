@@ -3,12 +3,14 @@ const path = require('path');
 const superagent = require('superagent');
 require('superagent-charset')(superagent);
 const Koa = require('koa');
+const cors = require('@koa/cors');
 const body = require('koa-body');
 const logger = require('koa-logger');
 const router = require('koa-router')({
 	prefix: '/api',
 });
 const static = require('koa-static')(path.resolve(__dirname, '.', 'dist'));
+require('./util'); //replaceAll
 
 const PORT = process.env.PORT || 5000;
 const ROOT_DIR = process.env.NODE_ENV === 'production' ? '/' : __dirname;
@@ -22,12 +24,14 @@ router.get('/getAllBooks', getAllBooks);
 // router.get('/getNoAbsBooksA', getNoAbsBooksA)
 
 // Middleware
+app.use(cors());
 app.use(body());
 app.use(logger());
 app.use(static);
 app.use(router.routes());
 app.use(router.allowedMethods());
 
+app;
 // Start server
 app.listen(PORT);
 console.log('* get 81 started on port %s', PORT);
@@ -61,10 +65,36 @@ async function getNoAbsBooks(ctx) {
 			} else if (line.includes(`class="footer"`)) {
 				keep = false;
 			}
+			if (line.includes('script')) {
+				return false;
+			}
 			return keep;
 		});
 
-		let resGood = cutAbs.join('\n');
+		let removeHTML = cutAbs.map(div => {
+			if (div.includes(`.html`)) {
+				div = div.replaceAll(`.html`, ``);
+			}
+			// if(div.includes(`option value`)){
+			// 	div = div.replaceAll()
+			// }
+			return div;
+		});
+
+		let addVueHref = removeHTML.map(div => {
+			if (div.includes(`href="/book`)) {
+				div = div.replaceAll(`href="/book`, `href="#/book`);
+			}
+			return div;
+		});
+
+		let resGood = addVueHref.join('\n');
+
+		let addJsOnchange = `<script>
+		function C(event){
+
+		}
+		</script>`;
 
 		ctx.response.body = resGood;
 	} catch (e) {

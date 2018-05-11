@@ -31,6 +31,7 @@
 	"files": ["index.js"],
 	"keywords": [""],
 	"dependencies": {
+		"@koa/cors": "2",
 		"cookie": "^0.3.1",
 		"form-data": "^2.3.2",
 		"gbk": "^0.1.0",
