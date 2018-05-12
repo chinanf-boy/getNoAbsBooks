@@ -20,7 +20,30 @@ node index.js
 
 ---
 
-1.
+## router
+
+1. `:get` - `/api/getAllBooks`
+
+2. `:post` { url } - `/api/getNoAbsBooks` 
+
+> request url, cut the Abs, return the html:string
+
+3. `:post` { url } - `/api/addJsonStore` 
+
+> add JsonStore-API __/books/chinaBookName/form__
+
+> form
+
+``` js
+		let form = {
+			id: URI.encode(url.href()),
+			routeLink: url.pathname(),
+			origin: url.origin(),
+			url: url.href(),
+			time: new Date().getTime(),
+			name: name,
+		};
+```
 
 ---
 
