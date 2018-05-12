@@ -209,11 +209,13 @@ async function addJsonStore(ctx) {
 		get bookName form url `);
 		let name = await idGetName(url.href());
 
-		let J = JSONSTORE + '/books/' + name;
-
 		if (!name) {
 			throw new Error('can not get book Name');
 		}
+
+		name = encodeURI(name);
+
+		let J = JSONSTORE + '/books/' + name;
 
 		debug(`post: /addJsonStore { url }
 		make >form< ready Up jsonstore `);
