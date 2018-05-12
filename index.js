@@ -69,6 +69,10 @@ async function getNoAbsBooks(ctx) {
 
 		let url = URI(U); // use urijs
 
+		if (uri.is('url') !== true) {
+			throw new TypeError(' post { url } no a type:url');
+		}
+
 		let resAgain = await superProGet(url.href());
 		debug(`post: /getNoAbsBooks \n use url get res`);
 
@@ -216,6 +220,10 @@ async function addJsonStore(ctx) {
 		let G = ctx.request.body;
 		let U = G.url;
 		let url = new URI(U);
+
+		if (uri.is('url') !== true) {
+			throw new TypeError(' post { url } no a type:url');
+		}
 
 		// get http://example.com
 		let source = url.origin();
