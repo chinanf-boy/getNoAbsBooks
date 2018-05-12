@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const URI = require('urijs');
-const hashids = require('hashids');
-
 const debug = require('debug')('getNoAbsBooks');
 
 const superagent = require('superagent');
@@ -67,14 +65,17 @@ async function getNoAbsBooks(ctx) {
 		let G = ctx.request.body;
 		let U = G.url; // get url
 
-		debug(`post: /getNoAbsBooks \n ${ctx.request.header} \n${G}`);
+		debug(`post: /getNoAbsBooks { url }\n ${ctx.request.header} \n${G}`);
 
 		let url = URI(U); // use urijs
 
 		let resAgain = await superProGet(url.href());
+		debug(`post: /getNoAbsBooks \n use url get res`);
 
 		let cutAbs = resAgain.text.split('\n');
 		let keep = false;
+
+		debug(`post: /getNoAbsBooks \n res.text -> cut Abs`);
 
 		cutAbs = cutAbs.filter(line => {
 			// just need header - footer
@@ -89,6 +90,8 @@ async function getNoAbsBooks(ctx) {
 			return keep;
 		});
 
+		debug(`post: /getNoAbsBooks \n res.text remove uri.suffix()`);
+
 		let removeHTML = cutAbs.map(div => {
 			// remove url_file.*
 			let h = url.suffix() || `html`;
@@ -100,6 +103,8 @@ async function getNoAbsBooks(ctx) {
 				div = div.replaceAll(h, ``);
 			}
 			// change 首页
+			debug(`post: /getNoAbsBooks \n res.text remove fontSize color set`);
+
 			if (div.includes(`首页`)) {
 				// origin
 				// "http://example.org/foo/hello.html" => 'http://example.org'
@@ -112,7 +117,9 @@ async function getNoAbsBooks(ctx) {
 			return div;
 		});
 
-		// make select element change work with $route
+		debug(`post: /getNoAbsBooks
+		 create JS: make select element change work with $route`);
+
 		let addJS = `onchange="
 		 var A = document.createElement('a');
 		 let href = window.location.href
@@ -130,6 +137,8 @@ async function getNoAbsBooks(ctx) {
 
 		let addVueHref = removeHTML.map(div => {
 			if (div.includes(`href="/book`)) {
+				debug(`post: /getNoAbsBooks
+				change /book => #/book`);
 				div = div.replaceAll(`href="/book`, `href="#/book`);
 			}
 			if (
@@ -137,6 +146,8 @@ async function getNoAbsBooks(ctx) {
 					`onchange="self.location.href=options[selectedIndex].value"`
 				)
 			) {
+				debug(`post: /getNoAbsBooks
+				add select onchange listen And remove old`);
 				div = div.replace(
 					`onchange="self.location.href=options[selectedIndex].value"`,
 					`${addJS} multiple style="width: 100%; height" `
@@ -144,6 +155,9 @@ async function getNoAbsBooks(ctx) {
 			}
 			return div;
 		});
+
+		debug(`post: /getNoAbsBooks
+		Done with get no abs book response html`);
 
 		let resGood = addVueHref.join('\n');
 
@@ -171,6 +185,9 @@ async function getAllBooks(ctx) {
 		let J = JSONSTORE + '/books';
 
 		let res = await superProG(J);
+
+		debug(`get: /getAllBooks
+		get all books form jsonStore `);
 
 		ctx.response.body = res.text;
 	} catch (e) {
@@ -203,6 +220,8 @@ async function addJsonStore(ctx) {
 		// get http://example.com
 		let source = url.origin();
 
+		debug(`post: /addJsonStore { url }
+		get bookName form url `);
 		let name = await idGetName(url.href());
 
 		let J = JSONSTORE + '/books/' + name;
@@ -211,6 +230,8 @@ async function addJsonStore(ctx) {
 			throw new Error('can not get Name');
 		}
 
+		debug(`post: /addJsonStore { url }
+		make >form< ready Up jsonstore `);
 		let form = {
 			id: URI.encode(url.href()),
 			routeLink: url.pathname(),
@@ -219,7 +240,9 @@ async function addJsonStore(ctx) {
 			time: new Date().getTime(),
 			name: name,
 		};
-		// console.log('addJSON ',form)
+
+		debug(`post: /addJsonStore { url }
+		Up jsonstore with books/>bookName</form`);
 		let res = await superProP(J, form);
 		ctx.response.body = res.text;
 	} catch (error) {
