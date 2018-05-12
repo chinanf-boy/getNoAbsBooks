@@ -77,7 +77,7 @@ async function getNoAbsBooks(ctx) {
 			if (div.includes(`首页`)) {
 				// origin
 				// "http://example.org/foo/hello.html" => 'http://example.org'
-				div = div.replace(url.origin(), '/');
+				div = div.replace(url.origin(), '#/');
 			}
 			let reMove = ['字体', '关灯', '护眼', '>大<', '>小<', '>中<'];
 			if (reMove.some(r => div.includes(r))) {
