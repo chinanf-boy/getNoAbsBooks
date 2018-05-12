@@ -16,6 +16,7 @@
 		"Wserver": "nodemon index.js",
 		"test": "nyc ava",
 		"precommit": "lint-staged",
+		"start": "node index.js",
 		"prettier":
 			"prettier --single-quote --trailing-comma es5 --write 'src/**/*.js'",
 		"npmUp": "npm version patch && npm publish",
@@ -33,6 +34,7 @@
 	"dependencies": {
 		"@koa/cors": "2",
 		"cookie": "^0.3.1",
+		"debug": "^3.1.0",
 		"form-data": "^2.3.2",
 		"gbk": "^0.1.0",
 		"got": "8.2.0",
@@ -44,6 +46,7 @@
 		"nodemon": "^1.17.4",
 		"superagent": "^3.8.3",
 		"superagent-charset": "^1.2.0",
+		"urijs": "^1.19.1",
 		"validate-switch": "^0.0.2"
 	},
 	"devDependencies": {
