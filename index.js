@@ -1,5 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const URI = require('urijs');
+const hashids = require('hashids');
+
+const debug = require('debug')('getNoAbsBooks');
+
 const superagent = require('superagent');
 require('superagent-charset')(superagent);
 const Koa = require('koa');
@@ -16,8 +21,8 @@ const PORT = process.env.PORT || 5000;
 const JSONSTORE =
 	process.env.JSONSTORE ||
 	'https://www.jsonstore.io/4035ca03c1c8b0b257ef405506b41d05d4115ec154d95076981290ebd8087daf';
+
 const ROOT_DIR = process.env.NODE_ENV === 'production' ? '/' : __dirname;
-let API = process.env.API || `http://m.76wx.com`;
 
 const app = new Koa();
 
@@ -60,9 +65,13 @@ const superProGet = async url => {
 async function getNoAbsBooks(ctx) {
 	try {
 		let G = ctx.request.body;
-		let U = G.url;
-		// console.log(U);
-		let resAgain = await superProGet(U);
+		let U = G.url; // get url
+
+		debug(`post: /getNoAbsBooks \n ${ctx.request.header} \n${G}`);
+
+		let url = URI(U); // use urijs
+
+		let resAgain = await superProGet(url.href());
 
 		let cutAbs = resAgain.text.split('\n');
 		let keep = false;
@@ -81,13 +90,20 @@ async function getNoAbsBooks(ctx) {
 		});
 
 		let removeHTML = cutAbs.map(div => {
-			// remove html
-			if (div.includes(`.html`)) {
-				div = div.replaceAll(`.html`, ``);
+			// remove url_file.*
+			let h = url.suffix() || `html`;
+			// "http://example.org/foo/hello.html" => 'html'
+
+			h = `.${h}`; // html => .html
+
+			if (div.includes(h)) {
+				div = div.replaceAll(h, ``);
 			}
 			// change 首页
 			if (div.includes(`首页`)) {
-				div = div.replace(API, '/');
+				// origin
+				// "http://example.org/foo/hello.html" => 'http://example.org'
+				div = div.replace(url.origin(), '/');
 			}
 			let reMove = ['字体', '关灯', '护眼', '>大<', '>小<', '>中<'];
 			if (reMove.some(r => div.includes(r))) {
@@ -96,6 +112,7 @@ async function getNoAbsBooks(ctx) {
 			return div;
 		});
 
+		// make select element change work with $route
 		let addJS = `onchange="
 		 var A = document.createElement('a');
 		 let href = window.location.href
@@ -180,19 +197,28 @@ const superProP = async (url, form) => {
 async function addJsonStore(ctx) {
 	try {
 		let G = ctx.request.body;
-		let ID = G.id;
-		let url = '/book/' + ID;
+		let U = G.url;
+		let url = new URI(U);
 
-		let source = removeHttP(API);
+		// get http://example.com
+		let source = url.origin();
 
-		let J = JSONSTORE + '/books/' + ID;
+		let name = await idGetName(url.href());
 
-		let name = await idGetName(ID);
+		let J = JSONSTORE + '/books/' + name;
+
 		if (!name) {
 			throw new Error('can not get Name');
 		}
 
-		let form = { id: ID, name, url, source, api: API };
+		let form = {
+			id: URI.encode(url.href()),
+			routeLink: url.pathname(),
+			origin: url.origin(),
+			url: url.href(),
+			time: new Date().getTime(),
+			name: name,
+		};
 		// console.log('addJSON ',form)
 		let res = await superProP(J, form);
 		ctx.response.body = res.text;
@@ -202,10 +228,9 @@ async function addJsonStore(ctx) {
 	}
 }
 
-async function idGetName(id) {
-	let U = `${API}/book/${id}/`;
+async function idGetName(url) {
 	// console.log('add',U)
-	let H = await superSource(U)
+	let H = await superSource(url)
 		.then(res => {
 			return res.text
 				.split('\n')
