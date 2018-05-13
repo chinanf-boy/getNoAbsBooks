@@ -84,8 +84,7 @@ async function getNoAbsBooks(ctx) {
 				}
 			}
 			// 上下页
-			let addPage = `onclick="
-				var A = document.createElement('a');
+			let addPage = `onclick="var A = document.createElement('a');
 				let href = window.location.href
 
 				if(window.location.href.includes('/index_')){
@@ -99,20 +98,17 @@ async function getNoAbsBooks(ctx) {
 
 				A.href= href+this.pathname
 				console.log(A)
-				A.click();"
+				A.click();
 
 				return false
+				"
 			`;
-			if (div.includes(`上一页`)) {
+			if (div.includes(`上一页`) && div.includes(`下一页`)) {
 				if (div.includes('href=')) {
-					div = div.replace('href', ` ${addPage} href`);
+					div = div.replace('href="', ` ${addPage} href="`);
 				}
 			}
-			if (div.includes(`下一页`)) {
-				if (div.includes('href=')) {
-					div = div.replace('href', ` ${addPage} href`);
-				}
-			}
+
 			let reMove = ['字体', '关灯', '护眼', '>大<', '>小<', '>中<'];
 			if (reMove.some(r => div.includes(r))) {
 				div = '';
