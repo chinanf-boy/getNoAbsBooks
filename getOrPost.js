@@ -78,6 +78,40 @@ async function getNoAbsBooks(ctx) {
 				// origin
 				// "http://example.org/foo/hello.html" => 'http://example.org'
 				div = div.replace(url.origin(), '#/');
+
+				if (div.includes(`href="/"`)) {
+					div = div.replace(`href="/"`, 'href="#/"');
+				}
+			}
+			// 上下页
+			let addPage = `onclick="
+				var A = document.createElement('a');
+				let href = window.location.href
+
+				if(window.location.href.includes('/index_')){
+				let RmHrefIndex = window.location.href.lastIndexOf('/')
+				href = href.substring(0, RmHrefIndex)
+				}
+
+				if(href.endsWith('/')){
+				href = href.slice(0, -1)
+				}
+
+				A.href= href+this.pathname
+				console.log(A)
+				A.click();"
+
+				return false
+			`;
+			if (div.includes(`上一页`)) {
+				if (div.includes('href=')) {
+					div = div.replace('href', ` ${addPage} href`);
+				}
+			}
+			if (div.includes(`下一页`)) {
+				if (div.includes('href=')) {
+					div = div.replace('href', ` ${addPage} href`);
+				}
 			}
 			let reMove = ['字体', '关灯', '护眼', '>大<', '>小<', '>中<'];
 			if (reMove.some(r => div.includes(r))) {
@@ -119,7 +153,7 @@ async function getNoAbsBooks(ctx) {
 				add select onchange listen And remove old`);
 				div = div.replace(
 					`onchange="self.location.href=options[selectedIndex].value"`,
-					`${addJS} style="width: 100%; height:auto" `
+					`${addJS} style="width: 50%; height:auto" `
 				);
 			}
 			return div;
