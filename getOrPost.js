@@ -50,16 +50,9 @@ async function getNoAbsBooks(ctx) {
 
 		cutAbs = cutAbs.filter(line => {
 			// just need header - footer
-			if (
-				line.includes(`class="header"`) ||
-				line.includes(`class="mmmlink"`) ||
-				line.includes('</script>')
-			) {
+			if (line.includes(`class="header"`) || line.includes(`class="mmmlink"`)) {
 				keep = true;
 			} else if (line.includes(`class="footer"`)) {
-				keep = false;
-			}
-			if (line.includes('<script>')) {
 				keep = false;
 			}
 			return keep;
