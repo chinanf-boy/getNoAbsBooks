@@ -119,7 +119,7 @@ async function getNoAbsBooks(ctx) {
 				add select onchange listen And remove old`);
 				div = div.replace(
 					`onchange="self.location.href=options[selectedIndex].value"`,
-					`${addJS} multiple style="width: 100%; height" `
+					`${addJS} style="width: 100%; height:auto" `
 				);
 			}
 			return div;
