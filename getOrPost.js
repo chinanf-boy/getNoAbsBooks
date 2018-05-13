@@ -32,13 +32,14 @@ async function getNoAbsBooks(ctx) {
 
 		debug(`post: /getNoAbsBooks { url }\n ${ctx.request.header} \n${G}`);
 
-		let url = URI(U); // use urijs
+		let url = new URI(U); // use urijs
 
-		if (url.is('url') !== true) {
+		if (!url.origin()) {
 			throw new TypeError(' post { url } no a type:url');
 		}
 
 		let resAgain = await superProGet(url.href());
+
 		debug(`post: /getNoAbsBooks \n use url get res`);
 
 		let cutAbs = resAgain.text.split('\n');
@@ -62,15 +63,6 @@ async function getNoAbsBooks(ctx) {
 		debug(`post: /getNoAbsBooks \n res.text remove uri.suffix()`);
 
 		let removeHTML = cutAbs.map(div => {
-			// remove url_file.*
-			let h = url.suffix() || `html`;
-			// "http://example.org/foo/hello.html" => 'html'
-
-			h = `.${h}`; // html => .html
-
-			if (div.includes(h)) {
-				div = div.replaceAll(h, ``);
-			}
 			// change 首页
 			debug(`post: /getNoAbsBooks \n res.text remove fontSize color set`);
 
@@ -162,8 +154,8 @@ async function getNoAbsBooks(ctx) {
 
 		ctx.response.body = resGood;
 	} catch (e) {
-		console.error(' getNoAbsBooks error', ctx.request);
-		ctx.response.status = 405;
+		console.error(' getNoAbsBooks error', e.status);
+		ctx.response.status = e.status;
 		ctx.response.body = e;
 	}
 }
@@ -197,7 +189,7 @@ async function getAllBooks(ctx) {
 		ctx.response.body = res.text;
 	} catch (e) {
 		console.error('\n> Could not obtain token\n' + e);
-		ctx.response.status = 405;
+		ctx.response.status = e.status;
 		ctx.response.body = '';
 	}
 }
