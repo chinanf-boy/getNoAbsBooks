@@ -63,15 +63,6 @@ async function getNoAbsBooks(ctx) {
 		debug(`post: /getNoAbsBooks \n res.text remove uri.suffix()`);
 
 		let removeHTML = cutAbs.map(div => {
-			// remove url_file.*
-			let h = url.suffix() || `html`;
-			// "http://example.org/foo/hello.html" => 'html'
-
-			h = `.${h}`; // html => .html
-
-			if (div.includes(h)) {
-				div = div.replaceAll(h, ``);
-			}
 			// change 首页
 			debug(`post: /getNoAbsBooks \n res.text remove fontSize color set`);
 
