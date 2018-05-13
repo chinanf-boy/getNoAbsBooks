@@ -40,6 +40,7 @@ async function getNoAbsBooks(ctx) {
 
 		let resAgain = await superProGet(url.href());
 
+		console.log('source html', resAgain.text);
 		debug(`post: /getNoAbsBooks \n use url get res`);
 
 		let cutAbs = resAgain.text.split('\n');
@@ -49,13 +50,17 @@ async function getNoAbsBooks(ctx) {
 
 		cutAbs = cutAbs.filter(line => {
 			// just need header - footer
-			if (line.includes(`class="header"`)) {
+			if (
+				line.includes(`class="header"`) ||
+				line.includes(`class="mmmlink"`) ||
+				line.includes('</script>')
+			) {
 				keep = true;
 			} else if (line.includes(`class="footer"`)) {
 				keep = false;
 			}
-			if (line.includes('script')) {
-				return false;
+			if (line.includes('<script>')) {
+				keep = false;
 			}
 			return keep;
 		});
@@ -63,6 +68,15 @@ async function getNoAbsBooks(ctx) {
 		debug(`post: /getNoAbsBooks \n res.text remove uri.suffix()`);
 
 		let removeHTML = cutAbs.map(div => {
+			// // remove url_file.*
+			// let h = url.suffix() || `html`;
+			// // "http://example.org/foo/hello.html" => 'html'
+
+			// h = `.${h}`; // html => .html
+
+			// if (div.includes(h)) {
+			// 	div = div.replaceAll(h, ``);
+			// }
 			// change 首页
 			debug(`post: /getNoAbsBooks \n res.text remove fontSize color set`);
 
@@ -89,10 +103,8 @@ async function getNoAbsBooks(ctx) {
 				}
 
 				A.href= href+this.pathname
-				console.log(A);
-				A.click();
-
-				return false
+				this.href= A.href
+				console.log(this);
 				"
 			`;
 			if (div.includes(`上一页`) && div.includes(`下一页`)) {
@@ -122,8 +134,9 @@ async function getNoAbsBooks(ctx) {
 			href += '/'
 		 }
 		 A.href= href+options[selectedIndex].value;
-		 console.log(A)
-		 A.click();"
+		 this.href= A.href
+		 console.log(this);
+
 		 `;
 
 		let addVueHref = removeHTML.map(div => {
@@ -151,6 +164,8 @@ async function getNoAbsBooks(ctx) {
 		Done with get no abs book response html`);
 
 		let resGood = addVueHref.join('\n');
+
+		console.log('cut html', resGood);
 
 		ctx.response.body = resGood;
 	} catch (e) {
