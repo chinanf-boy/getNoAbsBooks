@@ -107,7 +107,7 @@ async function getNoAbsBooks(ctx) {
 				console.log('pages',this);
 				"
 			`;
-			if (div.includes(`上一`) || div.includes(`下一`)) {
+			if (div.includes(`上一页`) || div.includes(`下一页`)) {
 				if (div.includes('href=')) {
 					div = div.replaceAll('href="', ` ${addPage} href="`);
 				}
@@ -220,7 +220,7 @@ async function getAllBooks(ctx) {
 	} catch (e) {
 		console.error('\n> Could not obtain token\n' + e);
 		ctx.response.status = e.status;
-		ctx.response.body = '';
+		ctx.response.body = e;
 	}
 }
 
