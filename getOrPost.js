@@ -1,5 +1,5 @@
 const debug = require('debug')('getNoAbsBooks');
-
+const cheerio = require('cheerio');
 const URI = require('urijs'); // uri
 
 const superagent = require('superagent');
@@ -40,7 +40,7 @@ async function getNoAbsBooks(ctx) {
 
 		let resAgain = await superProGet(url.href());
 
-		console.log('source html', resAgain.text);
+		// console.log('source html', resAgain.text);
 		debug(`post: /getNoAbsBooks \n use url get res`);
 
 		let cutAbs = resAgain.text.split('\n');
@@ -55,6 +55,7 @@ async function getNoAbsBooks(ctx) {
 			} else if (line.includes(`class="footer"`)) {
 				keep = false;
 			}
+
 			return keep;
 		});
 
@@ -83,33 +84,53 @@ async function getNoAbsBooks(ctx) {
 				}
 			}
 			// 上下页
-			let addPage = `onclick="var A = document.createElement('a');
-				let href = window.location.href;
+			let addPage = `onclick="
 
-				if(window.location.href.includes('/index_')){
-				let RmHrefIndex = window.location.href.lastIndexOf('/');
+				let href = window.location.href;
+				if(href.includes('/index_')){
+				let RmHrefIndex = href.lastIndexOf('/');
 				href = href.substring(0, RmHrefIndex);
 				}
 
 				if(href.endsWith('/')){
-				href = href.slice(0, -1);
+					let RmHrefIndex = href.lastIndexOf('/');
+					href = href.substring(0,RmHrefIndex)
 				}
+				let source = this.href
+				if(source.includes('/index_')){
+					let RmHrefIndex = source.lastIndexOf('/');
+					source = source.substring(RmHrefIndex);
+				}
+				console.log('pages add',href,source)
+				this.href= href + source
 
-				A.href= href+this.pathname
-				this.href= A.href
-				console.log(this);
+				console.log('pages',this);
 				"
 			`;
-			if (div.includes(`上一页`) && div.includes(`下一页`)) {
+			if (div.includes(`上一`) || div.includes(`下一`)) {
 				if (div.includes('href=')) {
-					div = div.replace('href="', ` ${addPage} href="`);
+					div = div.replaceAll('href="', ` ${addPage} href="`);
 				}
 			}
 
-			let reMove = ['字体', '关灯', '护眼', '>大<', '>小<', '>中<'];
+			let reMove = [
+				'字体',
+				'关灯',
+				'护眼',
+				'>大<',
+				'>小<',
+				'>中<',
+				'form>',
+				'input>',
+				'button>',
+			];
 			if (reMove.some(r => div.includes(r))) {
 				div = '';
 			}
+			if (div.includes('加入书架')) {
+				div = div.replace('加入书架', ``);
+			}
+
 			return div;
 		});
 
@@ -119,24 +140,25 @@ async function getNoAbsBooks(ctx) {
 		let addJS = `onchange="
 		 var A = document.createElement('a');
 		 let href = window.location.href
-		 if(window.location.href.includes('/index_')){
-			let RmHrefIndex = window.location.href.lastIndexOf('/')
+		 if(href.includes('/index_')){
+			let RmHrefIndex = href.lastIndexOf('/')
 			href = href.substring(0, RmHrefIndex)
 		 }
 		 if(!href.endsWith('/')){
 			href += '/'
 		 }
-		 A.href= href+options[selectedIndex].value;
-		 this.href= A.href
-		 console.log(this);
+		 A.href= href + this.options[selectedIndex].value;
 
+		 window.location.href = A.href
+		 console.log('meun',A);
+		 "
 		 `;
 
 		let addVueHref = removeHTML.map(div => {
-			if (div.includes(`href="/book`)) {
+			if (div.includes(`href="/`)) {
 				debug(`post: /getNoAbsBooks
-				change /book => #/book`);
-				div = div.replaceAll(`href="/book`, `href="#/book`);
+				change / => #/`);
+				div = div.replaceAll(`href="/`, `href="#/`);
 			}
 			if (
 				div.includes(
@@ -158,7 +180,7 @@ async function getNoAbsBooks(ctx) {
 
 		let resGood = addVueHref.join('\n');
 
-		console.log('cut html', resGood);
+		// console.log('cut html', resGood);
 
 		ctx.response.body = resGood;
 	} catch (e) {
@@ -264,7 +286,7 @@ async function addJsonStore(ctx) {
 		ctx.response.body = res.text;
 	} catch (error) {
 		console.error('addJSONSTORE error', error);
-		ctx.response.status = 405;
+		ctx.response.status = error.status || 405;
 		ctx.response.body = error;
 	}
 }
@@ -283,7 +305,7 @@ async function idGetName(url) {
 
 	H = H.slice(H.lastIndexOf('1">') + 3, -6);
 
-	return H;
+	return H.trim();
 }
 
 //
