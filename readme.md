@@ -10,7 +10,7 @@ git clone project
 
 ## HeroKu
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/chinanf-boy/getNoAbsBooks)
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ## Usage
 
@@ -22,27 +22,27 @@ node index.js
 
 ## router
 
-1. `:get` - `/api/getAllBooks`
+1.  `:get` - `/api/getAllBooks`
 
-2. `:post` { url } - `/api/getNoAbsBooks` 
+2.  `:post` { url } - `/api/getNoAbsBooks`
 
 > request url, cut the Abs, return the html:string
 
-3. `:post` { url } - `/api/addJsonStore` 
+3.  `:post` { url } - `/api/addJsonStore`
 
-> add JsonStore-API __/books/chinaBookName/form__
+> add JsonStore-API **/books/chinaBookName/form**
 
 > form
 
-``` js
-		let form = {
-			id: URI.encode(url.href()),
-			routeLink: url.pathname(),
-			origin: url.origin(),
-			url: url.href(),
-			time: new Date().getTime(),
-			name: name,
-		};
+```js
+let form = {
+	id: URI.encode(url.href()),
+	routeLink: url.pathname(),
+	origin: url.origin(),
+	url: url.href(),
+	time: new Date().getTime(),
+	name: name,
+};
 ```
 
 ---
