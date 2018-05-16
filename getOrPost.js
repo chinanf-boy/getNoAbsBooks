@@ -137,22 +137,7 @@ async function getNoAbsBooks(ctx) {
 		debug(`post: /getNoAbsBooks
 		 create JS: make select element change work with $route`);
 
-		let addJS = `onchange="
-		 var A = document.createElement('a');
-		 let href = window.location.href
-		 if(href.includes('/index_')){
-			let RmHrefIndex = href.lastIndexOf('/')
-			href = href.substring(0, RmHrefIndex)
-		 }
-		 if(!href.endsWith('/')){
-			href += '/'
-		 }
-		 A.href= href + this.options[selectedIndex].value;
-
-		 window.location.href = A.href
-		 console.log('meun',A);
-		 "
-		 `;
+		let addJS = `onchange="SelectJs"`;
 
 		let addVueHref = removeHTML.map(div => {
 			if (div.includes(`href="/`)) {
