@@ -137,7 +137,7 @@ async function getNoAbsBooks(ctx) {
 		debug(`post: /getNoAbsBooks
 		 create JS: make select element change work with $route`);
 
-		let addJS = `onchange="SelectJs"`;
+		let addJS = `onchange="SelectJs(this)"`;
 
 		let addVueHref = removeHTML.map(div => {
 			if (div.includes(`href="/`)) {
