@@ -11,6 +11,7 @@ const JSONSTORE =
 	process.env.JSONSTORE ||
 	'https://www.jsonstore.io/4035ca03c1c8b0b257ef405506b41d05d4115ec154d95076981290ebd8087daf';
 
+// getNoAbsBooks tools
 const superProGet = async url => {
 	return new Promise((ok, bad) => {
 		superagent
@@ -25,6 +26,7 @@ const superProGet = async url => {
 	});
 };
 
+// post: /getNoAbsBooks { url }
 async function getNoAbsBooks(ctx) {
 	try {
 		let G = ctx.request.body;
@@ -175,7 +177,7 @@ async function getNoAbsBooks(ctx) {
 	}
 }
 
-//
+// getAllBooks tools
 const superProG = async url => {
 	return new Promise((ok, bad) => {
 		superagent.get(url).end((err, res) => {
@@ -188,7 +190,7 @@ const superProG = async url => {
 };
 
 /**
- * @description
+ * @description get: /getAllBooks 「get all books form jsonStore」
  * @param {any} ctx
  * @returns {string|json}
  */
@@ -209,7 +211,48 @@ async function getAllBooks(ctx) {
 	}
 }
 
-//
+// delete: deleteJsonStore
+async function deleteJsonStore(ctx) {
+	try {
+		let G = ctx.request.body;
+		let U = G.name;
+		let pwd = G.pwd;
+
+		if (pwd != 'yobrave') {
+			// need pwd
+			throw new Error('get error pwd');
+		}
+
+		let url = JSONSTORE + '/books/';
+
+		url = url + U;
+
+		let res = await superProD(url);
+
+		debug(`delete: /deleteJsonStore
+		delete book with name and pwd `);
+
+		ctx.response.body = res.text;
+	} catch (error) {
+		console.error('\n> Could not delete\n' + e);
+		ctx.response.status = e.status;
+		ctx.response.body = e;
+	}
+}
+
+// deleteJsonStore tools
+const superProD = async url => {
+	return new Promise((ok, bad) => {
+		superagent.delete(url).end((err, res) => {
+			if (!err) {
+				ok(res);
+			}
+			bad(err);
+		});
+	});
+};
+
+// addJsonStore tools
 const superProP = async (url, form) => {
 	return new Promise((ok, bad) => {
 		superagent
@@ -225,7 +268,7 @@ const superProP = async (url, form) => {
 };
 
 /**
- * @description
+ * @description post: /addJsonStore { url } get bookName form url
  * @param {url} ctx.request.body.url
  * @returns {any}
  */
@@ -276,6 +319,7 @@ async function addJsonStore(ctx) {
 	}
 }
 
+// addJSONSTORE tools
 async function idGetName(url) {
 	// console.log('add',U)
 	let H = await superSource(url)
@@ -293,8 +337,7 @@ async function idGetName(url) {
 	return H.trim();
 }
 
-//
-
+// idGetName tools
 const superSource = async url => {
 	return new Promise((ok, bad) => {
 		superagent
@@ -313,4 +356,5 @@ module.exports = {
 	getNoAbsBooks,
 	getAllBooks,
 	addJsonStore,
+	deleteJsonStore,
 };

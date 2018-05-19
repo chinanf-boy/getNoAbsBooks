@@ -18,11 +18,17 @@ const ROOT_DIR = process.env.NODE_ENV === 'production' ? '/' : __dirname;
 const app = new Koa();
 
 // route func
-const { getNoAbsBooks, getAllBooks, addJsonStore } = require('./getOrPost');
+const {
+	getNoAbsBooks,
+	getAllBooks,
+	addJsonStore,
+	deleteJsonStore,
+} = require('./getOrPost');
 
 // Routes definition
 router.post('/getNoAbsBooks', getNoAbsBooks);
 router.post('/addJsonStore', addJsonStore);
+router.delete('/deleteJsonStore', deleteJsonStore);
 
 router.get('/getAllBooks', getAllBooks);
 
