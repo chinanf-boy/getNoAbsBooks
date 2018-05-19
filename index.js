@@ -28,7 +28,7 @@ const {
 // Routes definition
 router.post('/getNoAbsBooks', getNoAbsBooks);
 router.post('/addJsonStore', addJsonStore);
-router.delete('/deleteJsonStore', deleteJsonStore);
+router.post('/deleteJsonStore', deleteJsonStore);
 
 router.get('/getAllBooks', getAllBooks);
 
