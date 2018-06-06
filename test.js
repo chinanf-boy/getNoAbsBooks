@@ -61,3 +61,17 @@ test(':post /api/getNoAbsBooks', async t => {
 	// res. from post jsonstore is object
 	t.is(res['ok'], true);
 });
+
+test.failing(':post /api/delJsonStore no pwd', async t => {
+	const { deleteJsonStore } = require('./getOrPost');
+	let A = 'deleteJsonStore';
+
+	const res = await request(makeApp(deleteJsonStore, `${A}`, 'post').listen())
+		.post(`/${A}`)
+		.send({ name: 'name', pwd: '' })
+		.then(res => {
+			return res;
+		});
+	// res. from post jsonstore is object
+	t.is(res['ok'], true);
+});

@@ -220,7 +220,7 @@ async function deleteJsonStore(ctx) {
 
 		if (pwd != 'yobrave') {
 			// need pwd
-			throw new Error('get error pwd');
+			throw new TypeError('get error pwd');
 		}
 
 		let url = JSONSTORE + '/books/';
@@ -235,7 +235,7 @@ async function deleteJsonStore(ctx) {
 		ctx.response.body = res.text;
 	} catch (error) {
 		console.error('\n> Could not delete\n' + error);
-		ctx.response.status = error.status;
+		ctx.response.status = error.status || 404;
 		ctx.response.body = error;
 	}
 }
