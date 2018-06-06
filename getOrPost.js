@@ -234,9 +234,9 @@ async function deleteJsonStore(ctx) {
 
 		ctx.response.body = res.text;
 	} catch (error) {
-		console.error('\n> Could not delete\n' + e);
-		ctx.response.status = e.status;
-		ctx.response.body = e;
+		console.error('\n> Could not delete\n' + error);
+		ctx.response.status = error.status;
+		ctx.response.body = error;
 	}
 }
 
