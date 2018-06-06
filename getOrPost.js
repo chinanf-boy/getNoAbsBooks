@@ -173,7 +173,7 @@ async function getNoAbsBooks(ctx) {
 	} catch (e) {
 		console.error(' getNoAbsBooks error', e.status);
 		ctx.response.status = e.status;
-		ctx.response.body = e;
+		ctx.response.body = e.message;
 	}
 }
 
@@ -207,7 +207,7 @@ async function getAllBooks(ctx) {
 	} catch (e) {
 		console.error('\n> Could not obtain token\n' + e);
 		ctx.response.status = e.status;
-		ctx.response.body = e;
+		ctx.response.body = e.message;
 	}
 }
 
@@ -236,7 +236,7 @@ async function deleteJsonStore(ctx) {
 	} catch (error) {
 		console.error('\n> Could not delete\n' + error);
 		ctx.response.status = error.status || 404;
-		ctx.response.body = error;
+		ctx.response.body = error.message;
 	}
 }
 
@@ -315,7 +315,7 @@ async function addJsonStore(ctx) {
 	} catch (error) {
 		console.error('addJSONSTORE error', error);
 		ctx.response.status = error.status || 405;
-		ctx.response.body = error;
+		ctx.response.body = error.message;
 	}
 }
 
