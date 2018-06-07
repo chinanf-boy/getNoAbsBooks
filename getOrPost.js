@@ -82,7 +82,7 @@ async function getNoAbsBooks(ctx) {
 				div = div.replace(url.origin(), '#/');
 
 				if (div.includes(`href="/"`)) {
-					div = div.replace(`href="/"`, 'href="#/"');
+					div = div.replace(`href="/"`, `href="#/"`);
 				}
 			}
 			// 上下页
@@ -145,7 +145,7 @@ async function getNoAbsBooks(ctx) {
 			if (div.includes(`href="/`)) {
 				debug(`post: /getNoAbsBooks
 				change / => #/`);
-				div = div.replaceAll(`href="/`, `href="#/`);
+				div = div.replaceAll(`href="/`, `href="#/${url.origin()}/`);
 			}
 			if (
 				div.includes(
