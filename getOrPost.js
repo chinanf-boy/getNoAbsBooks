@@ -86,28 +86,7 @@ async function getNoAbsBooks(ctx) {
 				}
 			}
 			// 上下页
-			let addPage = `onclick="
-
-				let href = window.location.href;
-				if(href.includes('/index_')){
-				let RmHrefIndex = href.lastIndexOf('/');
-				href = href.substring(0, RmHrefIndex);
-				}
-
-				if(href.endsWith('/')){
-					let RmHrefIndex = href.lastIndexOf('/');
-					href = href.substring(0,RmHrefIndex)
-				}
-				let source = this.href
-				if(source.includes('/index_')){
-					let RmHrefIndex = source.lastIndexOf('/');
-					source = source.substring(RmHrefIndex);
-				}
-				console.log('pages add',href,source)
-				this.href= href + source
-
-				console.log('pages',this);
-				"
+			let addPage = `onclick="pageButton(this)"
 			`;
 			if (div.includes(`上一页`) || div.includes(`下一页`)) {
 				if (div.includes('href=')) {
