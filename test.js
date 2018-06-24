@@ -1,7 +1,7 @@
 import test from 'ava';
 const request = require('supertest');
 
-const T = 'http://m.76wx.com/book/1563/';
+const T = 'https://m.zwdu.com/book/9623/';
 
 function makeApp(func, route, method = 'get') {
 	// koa
