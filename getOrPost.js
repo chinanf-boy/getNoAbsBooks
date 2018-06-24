@@ -11,11 +11,16 @@ const JSONSTORE =
 	process.env.JSONSTORE ||
 	'https://www.jsonstore.io/4035ca03c1c8b0b257ef405506b41d05d4115ec154d95076981290ebd8087daf';
 
+const TIMEOUT = 8000;
+
 // getNoAbsBooks tools
 const superProGet = async url => {
 	return new Promise((ok, bad) => {
 		superagent
 			.get(url)
+			.timeout({
+				response: TIMEOUT,
+			})
 			.charset('gbk')
 			.end((err, res) => {
 				if (!err) {
@@ -159,12 +164,17 @@ async function getNoAbsBooks(ctx) {
 // getAllBooks tools
 const superProG = async url => {
 	return new Promise((ok, bad) => {
-		superagent.get(url).end((err, res) => {
-			if (!err) {
-				ok(res);
-			}
-			bad(err);
-		});
+		superagent
+			.get(url)
+			.timeout({
+				response: TIMEOUT,
+			})
+			.end((err, res) => {
+				if (!err) {
+					ok(res);
+				}
+				bad(err);
+			});
 	});
 };
 
