@@ -265,6 +265,14 @@ async function addBookTags(ctx) {
 	try {
 		let G = ctx.request.body;
 		let U = G.url;
+		let title = G.title;
+		// get book name
+		let bookName = '';
+		if (title.indexOf('>') >= 0) {
+			bookName = title.slice(0, title.indexOf('>')).trim();
+		}
+		bookName = URI.encode(bookName);
+
 		let url = new URI(U);
 
 		if (url.is('url') !== true) {
@@ -277,8 +285,8 @@ async function addBookTags(ctx) {
 		debug(`post: /addBookTags { url }
 		get bookName form url `);
 
-		let id = URI.encode(url.origin());
-		let J = JSONSTORE + '/booktags/' + id;
+		let TAG = bookName || URI.encode(title);
+		let J = JSONSTORE + '/booktags/' + TAG;
 
 		debug(`post: /addBookTags { url }
 		make >form< ready Up jsonstore `);
@@ -288,10 +296,12 @@ async function addBookTags(ctx) {
 			origin: url.origin(),
 			url: url.href(),
 			time: new Date().getTime(),
+			name: bookName,
+			title,
 		};
 
 		debug(`post: /addBookTags { url }
-		Up jsonstore with books/>bookName</form`);
+		Up jsonstore with booktags/url.origin/form`);
 		let res = await superProP(J, form);
 		ctx.response.body = res.text;
 	} catch (error) {

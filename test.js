@@ -54,7 +54,7 @@ test(':post /api/addBookTags', async t => {
 
 	const res = await request(makeApp(addBookTags, `${A}`, 'post').listen())
 		.post(`/${A}`)
-		.send({ url: T })
+		.send({ url: T, title: 'test' })
 		.then(res => {
 			return res;
 		});
