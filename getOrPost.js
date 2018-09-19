@@ -185,12 +185,12 @@ const superProG = async url => {
  */
 async function getAllBooks(ctx) {
 	try {
-		let J = JSONSTORE + '/books';
+		let J = JSONSTORE;
 
 		let res = await superProG(J);
 
 		debug(`get: /getAllBooks
-		get all books form jsonStore `);
+		get all books + booktags form jsonStore `);
 
 		ctx.response.body = res.text;
 	} catch (e) {
