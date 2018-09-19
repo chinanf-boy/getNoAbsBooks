@@ -48,6 +48,20 @@ test(':post /api/addJsonStore', async t => {
 	t.is(res['ok'], true);
 });
 
+test(':post /api/addBookTags', async t => {
+	const { addBookTags } = require('./getOrPost');
+	let A = 'addBookTags';
+
+	const res = await request(makeApp(addBookTags, `${A}`, 'post').listen())
+		.post(`/${A}`)
+		.send({ url: T })
+		.then(res => {
+			return res;
+		});
+	// res. from post jsonstore is object
+	t.is(res['ok'], true);
+});
+
 test(':post /api/getNoAbsBooks', async t => {
 	const { getNoAbsBooks } = require('./getOrPost');
 	let A = 'getNoAbsBooks';

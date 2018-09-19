@@ -23,12 +23,15 @@ const {
 	getAllBooks,
 	addJsonStore,
 	deleteJsonStore,
+	addBookTags,
 } = require('./getOrPost');
 
 // Routes definition
 router.post('/getNoAbsBooks', getNoAbsBooks);
 router.post('/addJsonStore', addJsonStore);
 router.post('/deleteJsonStore', deleteJsonStore);
+
+router.post('/addBookTags', addBookTags);
 
 router.get('/getAllBooks', getAllBooks);
 

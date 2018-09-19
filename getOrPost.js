@@ -261,6 +261,51 @@ const superProP = async (url, form) => {
  * @param {url} ctx.request.body.url
  * @returns {any}
  */
+async function addBookTags(ctx) {
+	try {
+		let G = ctx.request.body;
+		let U = G.url;
+		let url = new URI(U);
+
+		if (url.is('url') !== true) {
+			throw new TypeError(' post { url } no a type:url');
+		}
+
+		// get http://example.com
+		let source = url.origin();
+
+		debug(`post: /addBookTags { url }
+		get bookName form url `);
+
+		let id = URI.encode(url.origin());
+		let J = JSONSTORE + '/booktags/' + id;
+
+		debug(`post: /addBookTags { url }
+		make >form< ready Up jsonstore `);
+		let form = {
+			id: URI.encode(url.href()),
+			routeLink: url.pathname(),
+			origin: url.origin(),
+			url: url.href(),
+			time: new Date().getTime(),
+		};
+
+		debug(`post: /addBookTags { url }
+		Up jsonstore with books/>bookName</form`);
+		let res = await superProP(J, form);
+		ctx.response.body = res.text;
+	} catch (error) {
+		console.error('addBookTags error', error);
+		ctx.response.status = error.status || 405;
+		ctx.response.body = error.message;
+	}
+}
+
+/**
+ * @description post: /addJsonStore { url } get bookName form url
+ * @param {url} ctx.request.body.url
+ * @returns {any}
+ */
 async function addJsonStore(ctx) {
 	try {
 		let G = ctx.request.body;
@@ -346,4 +391,5 @@ module.exports = {
 	getAllBooks,
 	addJsonStore,
 	deleteJsonStore,
+	addBookTags,
 };

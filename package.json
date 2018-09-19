@@ -13,10 +13,10 @@
 		"node": ">=4"
 	},
 	"scripts": {
-		"Wserver": "nodemon index.js",
+		"Wserver": "nodemon server.js",
 		"test": "nyc ava",
 		"precommit": "lint-staged",
-		"start": "node index.js",
+		"start": "node server.js",
 		"prettier":
 			"prettier --single-quote --trailing-comma es5 --write 'src/**/*.js'",
 		"npmUp": "npm version patch && npm publish",
@@ -29,7 +29,7 @@
 			"git add"
 		]
 	},
-	"files": ["index.js"],
+	"files": ["server.js"],
 	"keywords": [""],
 	"dependencies": {
 		"@koa/cors": "2",
